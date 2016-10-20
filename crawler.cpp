@@ -319,6 +319,7 @@ void* clientThread ( void *args ) {
         //printf("Found %i links: %i products and %i result pages\n", n_links, n_products, n_results);
     }   
     else {
+        http_response = http_response.substr(http_response.find("<html"));
         pthread_mutex_lock(&mutex);
         printf("%s |urldelimit| %s\n", data, http_response.c_str()); 
         //fwrite(data,  sizeof(char), strlen(data), fp); 

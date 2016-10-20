@@ -1,16 +1,3 @@
-tcpclient.cpp
-Details
-Activity
-TODAY
-
-You uploaded an item
-4:35 AM
-C++
-tcpclient.cpp
-No recorded activity before October 20, 2016
-New Team Drive
-
-
 /* 
     Web Crawler Program 
 
@@ -33,7 +20,7 @@ New Team Drive
         g++ -o crawler crawler.cpp -Wno-write-strings -std=gnu++11 -lsocket -lnsl -lpthread -lssl -lcrypto
 
     To run:
-        ./tcpclient <search term>
+        ./crawler <search term>
  */
 
 #include <sys/socket.h>
@@ -263,9 +250,9 @@ void* clientThread ( void *args ) {
         memset(recv_data, 0, sizeof(recv_data));
 
         if (https) 
-            bytes_received = SSL_read(ssl, recv_data, sizeof(recv_data)-1); 
+            bytes_received = SSL_read(ssl, recv_data, sizeof(recv_data)); 
         else
-            bytes_received = recv(sock, recv_data, sizeof(recv_data)-1, 0);
+            bytes_received = recv(sock, recv_data, sizeof(recv_data), 0);
 
         if (bytes_received == -1) 
             pthread_error("Error: Receive\n");
@@ -293,7 +280,7 @@ void* clientThread ( void *args ) {
             first_packet = false;
         }
 
-        recv_data[bytes_received] = '\0'; // make it null terminated
+        //recv_data[bytes_received] = '\0'; // make it null terminated
         string recv_message = string(recv_data);
         if (recv_message.find("</html>") != string::npos) 
             recv_message = recv_message.substr(0, strlen(recv_message.c_str())-strlen(recv_message.substr(recv_message.find("</html>")).c_str())+strlen("</html>"));
@@ -334,10 +321,10 @@ void* clientThread ( void *args ) {
     else {
         pthread_mutex_lock(&mutex);
         printf("%s |urldelimit| %s\n", data, http_response.c_str()); 
-        fwrite(data,  sizeof(char), strlen(data), fp); 
-        fwrite("|urldelimit|",  sizeof(char), strlen("|urldelimit|"), fp);
-        fwrite(http_response.c_str(),  sizeof(char), strlen(http_response.c_str()+1), fp);  
-        fwrite("\n",  sizeof(char), strlen("\n"), fp);
+        //fwrite(data,  sizeof(char), strlen(data), fp); 
+        //fwrite("|urldelimit|",  sizeof(char), strlen("|urldelimit|"), fp);
+        //fwrite(http_response.c_str(),  sizeof(char), strlen(http_response.c_str()+1), fp);  
+        //fwrite("\n",  sizeof(char), strlen("\n"), fp);
         pthread_mutex_unlock(&mutex); 
     } 
 

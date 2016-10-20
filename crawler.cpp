@@ -321,7 +321,7 @@ void* clientThread ( void *args ) {
     else {
         http_response = http_response.substr(http_response.find("<html"));
         pthread_mutex_lock(&mutex);
-        printf("%s |urldelimit| %s\n", data, http_response.c_str()); 
+        printf("%s|urldelimit|%s\n", data, http_response.c_str()); 
         //fwrite(data,  sizeof(char), strlen(data), fp); 
         //fwrite("|urldelimit|",  sizeof(char), strlen("|urldelimit|"), fp);
         //fwrite(http_response.c_str(),  sizeof(char), strlen(http_response.c_str()+1), fp);  

@@ -20,7 +20,7 @@
         g++ -o crawler crawler.cpp -Wno-write-strings -std=gnu++11 -lsocket -lnsl -lpthread -lssl -lcrypto
 
     To run:
-        ./crawler <search term>
+        ./crawler <num_links> <search term>
  */
 
 #include <sys/socket.h>
@@ -48,7 +48,6 @@
 using namespace std;
 
 #define MAX_THREADS 200
-#define TARGET 500
 
 pthread_mutex_t mutex;
 
@@ -82,7 +81,8 @@ char *ebay_format = "http://www.ebay.com/sch/i.html?_from=R40&_trksid=m570.l1313
  */
 char *data_format = "%s%s%s\n";
 
-int n_threads = 0, n_products = 0, n_results = 0, n_links = 0;;
+int n_threads = 0, n_products = 0, n_results = 0, n_links = 0;
+int target = 0;
 string search_term;
 FILE *fp = NULL;
 
@@ -112,7 +112,7 @@ set<string> extract_links(string html) {
 /* Thread handling one particular URL */
 void* clientThread ( void *args ) {
 
-    if (n_links > TARGET)
+    if (n_links > target)
         pthread_exit(NULL);
     
     /* for socket */
@@ -370,13 +370,16 @@ int main(int argc,char *argv[])  //AaBee TCP Client
     int size = 0;
     char *amazon_url, *ebay_url;
 
-    if (argc < 1) 
-        error("Empty search term");
+   if (argc < 1) 
+        error("Empty num links or search term");
+
+    /* get num of links to be crawled */
+    target = atoi(argv[1]);
 
     /* get search term and replace space with "+" */
-    string search_term = argv[1];
-    if (argc > 1) {
-        for (int i = 2; i < argc; i++) {
+    string search_term = argv[2];
+    if (argc > 2) {
+        for (int i = 3; i < argc; i++) {
             search_term += "+";
             search_term += argv[i];
         }
@@ -431,7 +434,7 @@ int main(int argc,char *argv[])  //AaBee TCP Client
             }   
         } 
 
-        if (n_links > TARGET)
+        if (n_links > target)
             break; 
     }
 

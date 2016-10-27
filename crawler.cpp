@@ -280,11 +280,7 @@ void* clientThread ( void *args ) {
             first_packet = false;
         }
 
-        //recv_data[bytes_received] = '\0'; // make it null terminated
-        string recv_message = string(recv_data);
-        if (recv_message.find("</html>") != string::npos) 
-            recv_message = recv_message.substr(0, strlen(recv_message.c_str())-strlen(recv_message.substr(recv_message.find("</html>")).c_str())+strlen("</html>"));
-        http_response += recv_message; // collate http response packets
+        http_response.append(recv_data); // collate http response packets
 
     } while (bytes_received > 0);
 
@@ -319,15 +315,23 @@ void* clientThread ( void *args ) {
         //printf("Found %i links: %i products and %i result pages\n", n_links, n_products, n_results);
     }   
     else {
-        if (http_response.find("<html") != string::npos) 
-            http_response = http_response.substr(http_response.find("<html"));
-        pthread_mutex_lock(&mutex);
-        printf("%s|urldelimit|%s\n", data, http_response.c_str()); 
-        //fwrite(data,  sizeof(char), strlen(data), fp); 
-        //fwrite("|urldelimit|",  sizeof(char), strlen("|urldelimit|"), fp);
-        //fwrite(http_response.c_str(),  sizeof(char), strlen(http_response.c_str()+1), fp);  
-        //fwrite("\n",  sizeof(char), strlen("\n"), fp);
-        pthread_mutex_unlock(&mutex); 
+        if (http_response.find("HTTP") != string::npos) {
+            char* valid_code = "200";
+            if (strcmp(http_response.substr(9,3).c_str(), valid_code) == 0) { // keep only the pages with valid status code
+                if (http_response.find("</html>") != string::npos) 
+                    http_response = http_response.substr(0, strlen(http_response.c_str())-strlen(http_response.substr(http_response.find("</html>")).c_str())+strlen("</html>"));
+                
+                if (http_response.find("<html") != string::npos) 
+                    http_response = http_response.substr(http_response.find("<html"));
+                pthread_mutex_lock(&mutex);
+                printf("%s|urldelimit|%s\n", data, http_response.c_str()); 
+                //fwrite(data,  sizeof(char), strlen(data), fp); 
+                //fwrite("|urldelimit|",  sizeof(char), strlen("|urldelimit|"), fp);
+                //fwrite(http_response.c_str(),  sizeof(char), strlen(http_response.c_str()+1), fp);  
+                //fwrite("\n",  sizeof(char), strlen("\n"), fp);
+                pthread_mutex_unlock(&mutex);
+            }
+        } 
     } 
 
     // free memory allocated
